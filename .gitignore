@@ -107,3 +107,26 @@ Back-end/orbita.API/.vs
 
 Back-end/orbita.API/bin
 Back-end/orbita.API/obj
+
+.DS_Store
+Front-End/node_modules
+Front-End/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+Front-End/npm-debug.log*
+Front-End/yarn-debug.log*
+Front-End/yarn-error.log*
+Front-End/pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

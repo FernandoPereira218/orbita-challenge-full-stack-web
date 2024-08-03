@@ -27,9 +27,36 @@ namespace orbita.API.Controllers
 
         // GET: api/Students
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudents(int? page = null, int? pageLength = null, string search = "")
         {
-            return await _context.Students.ToListAsync();
+            if (!page.HasValue)
+                Errors.Add(new { Propery = "page", Message = "Page must have a value" });
+            if (!pageLength.HasValue)
+                Errors.Add(new { Propery = "pageLength", Message = "PageLength must have a value" });
+
+            if (IsValid)
+            {
+                var studentList = await _context.Students.ToListAsync();
+
+                if (!string.IsNullOrEmpty(search)) //Search filter
+                {
+                    search = search.ToLower();
+                    studentList = studentList.Where(x =>
+                    x.CPF.ToLower().Contains(search) ||
+                    x.Name.ToLower().Contains(search) ||
+                    x.StudentID.ToLower().Contains(search) ||
+                    x.Email.ToLower().Contains(search))
+                   .ToList();
+                }
+
+                studentList = studentList.Skip((page.Value - 1) * pageLength.Value)
+                    .Take(pageLength.Value)
+                    .ToList();
+
+                return Ok(studentList);
+            }
+            else
+                return BadRequest(new { Errors });
         }
 
         // GET: api/Students/5

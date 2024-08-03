@@ -6,6 +6,8 @@
 		Pomelo.EntityFrameworkCore.MySql
 	
 	## Front-end
+		axios
+		Sweet Alert
 	
 # Detalhes
 	O back-end foi desenvolvido utilizando .NET Core 8.
