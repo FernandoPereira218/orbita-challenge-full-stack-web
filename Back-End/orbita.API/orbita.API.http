@@ -1,0 +1,6 @@
+@orbita.API_HostAddress = http://localhost:5289
+
+GET {{orbita.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

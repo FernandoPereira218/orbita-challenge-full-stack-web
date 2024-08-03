@@ -1,0 +1,184 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using orbita.API.Data;
+using orbita.API.Models;
+using orbita.API.Handlers;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+
+namespace orbita.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class StudentsController : ControllerBase
+    {
+        private readonly APIDbContext _context;
+        private List<object> Errors { get; set; } = new List<object>();
+        private bool IsValid => !Errors.Any();
+
+        public StudentsController(APIDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/Students
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
+        {
+            return await _context.Students.ToListAsync();
+        }
+
+        // GET: api/Students/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Student>> GetStudent(string id)
+        {
+            var student = await _context.Students.FindAsync(id);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return student;
+        }
+
+        // PUT: api/Students/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutStudent(string id, Student student)
+        {
+            if (id != student.StudentID)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(student).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!StudentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Students
+        [HttpPost]
+        public async Task<ActionResult<Student>> PostStudent(AddUpdateStudentData request)
+        {
+            StudentDataValidation(request);
+
+            if (IsValid)
+            {
+                string studentID = GetNextStudentID();
+                var student = new Student
+                {
+                    CPF = request.CPF,
+                    Email = request.Email,
+                    Name = request.Name,
+                    StudentID = studentID
+                };
+                _context.Students.Add(student);
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    if (StudentExists(student.StudentID))
+                    {
+                        return Conflict();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                //return CreatedAtAction("GetStudent", new { id = student.StudentID }, student);
+                return Ok(new { message = "Student added successfully" });
+                
+            }
+            else
+                return BadRequest(new
+                {
+                    Errors
+                });
+        }
+
+        // DELETE: api/Students/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudent(string id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool StudentExists(string id)
+        {
+            return _context.Students.Any(e => e.StudentID == id);
+        }
+
+        private void StudentDataValidation(AddUpdateStudentData data)
+        {
+            if (data == null)
+                Errors.Add(new { Message = "Data is null" });
+            else
+            {
+                if (string.IsNullOrEmpty(data.CPF))
+                    Errors.Add(new { Property = "CPF", Message = "CPF field is required" });
+                else if (data.CPF.Length != 11)
+                    Errors.Add(new { Property = "CPF", Message = "CPF must have 11 characters" });
+
+                if (string.IsNullOrEmpty(data.Name))
+                    Errors.Add(new { Property = "Name", Message = "Name field is required" });
+                else if (data.Name.Length < 3)
+                    Errors.Add(new { Property = "Name", Message = "Email must have at least 3 characters" });
+
+                if (string.IsNullOrEmpty(data.Email))
+                    Errors.Add(new { Property = "Email", Message = "Email field is required" });
+                else if (data.Email.Length < 3)
+                    Errors.Add(new { Property = "Email", Message = "Email must have at least 3 characters" });
+            }
+        }
+
+        private string GetNextStudentID()
+        {
+            string? lastID = _context.Students.OrderByDescending(x => x.StudentID).FirstOrDefault()?.StudentID;
+            int year = Convert.ToInt32(lastID.Substring(0, 4));
+            int semester = Convert.ToInt32(lastID.Substring(4, 1));
+            int digit = Convert.ToInt32(lastID.Substring(5, 4));
+
+            DateTime currentDate = DateTime.Now;
+            int currentSemester = currentDate.Month <= 5 ? 1 : 2;
+
+            int nextDigit = (currentDate.Year == year && semester == currentSemester) ? digit + 1 : 1;
+
+            string nextID = string.Format("{0}{1}{2}", currentDate.Year, currentSemester, nextDigit.ToString().PadLeft(4, '0'));
+            return nextID;
+        }
+    }
+}
