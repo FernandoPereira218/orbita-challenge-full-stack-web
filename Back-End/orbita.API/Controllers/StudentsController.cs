@@ -48,37 +48,43 @@ namespace orbita.API.Controllers
 
         // PUT: api/Students/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudent(string id, Student student)
+        public async Task<IActionResult> PutStudent(string id, UpdateStudentData request)
         {
-            if (id != student.StudentID)
-            {
-                return BadRequest();
-            }
+            StudentDataValidation(request, id);
 
-            _context.Entry(student).State = EntityState.Modified;
+            if (IsValid)
+            {
+                var student = _context.Students.Where(x => x.StudentID == id).FirstOrDefault();
+                student.Name = request.Name;
+                student.Email = request.Name;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StudentExists(id))
+                _context.Update(student);
+
+                try
                 {
-                    return NotFound();
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!StudentExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-            }
 
-            return NoContent();
+                return Ok(new { message = "Student updated successfully" });
+            }
+            else
+                return BadRequest(new { Errors });
         }
 
         // POST: api/Students
         [HttpPost]
-        public async Task<ActionResult<Student>> PostStudent(AddUpdateStudentData request)
+        public async Task<ActionResult<Student>> PostStudent(AddStudentData request)
         {
             StudentDataValidation(request);
 
@@ -110,7 +116,6 @@ namespace orbita.API.Controllers
                     }
                 }
 
-                //return CreatedAtAction("GetStudent", new { id = student.StudentID }, student);
                 return Ok(new { message = "Student added successfully" });
                 
             }
@@ -125,16 +130,16 @@ namespace orbita.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(string id)
         {
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
+            if (!StudentExists(id))
             {
                 return NotFound();
             }
 
+            var student = _context.Students.Where(x => x.StudentID == id).FirstOrDefault();
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new { Message = "Student deleted successfully" });
         }
 
         private bool StudentExists(string id)
@@ -142,16 +147,37 @@ namespace orbita.API.Controllers
             return _context.Students.Any(e => e.StudentID == id);
         }
 
-        private void StudentDataValidation(AddUpdateStudentData data)
+        private void StudentDataValidation(AddStudentData data)
         {
             if (data == null)
                 Errors.Add(new { Message = "Data is null" });
-            else
+            else //POST validation
             {
                 if (string.IsNullOrEmpty(data.CPF))
                     Errors.Add(new { Property = "CPF", Message = "CPF field is required" });
                 else if (data.CPF.Length != 11)
                     Errors.Add(new { Property = "CPF", Message = "CPF must have 11 characters" });
+
+                if (string.IsNullOrEmpty(data.Name))
+                    Errors.Add(new { Property = "Name", Message = "Name field is required" });
+                else if (data.Name.Length < 3)
+                    Errors.Add(new { Property = "Name", Message = "Email must have at least 3 characters" });
+
+                if (string.IsNullOrEmpty(data.Email))
+                    Errors.Add(new { Property = "Email", Message = "Email field is required" });
+                else if (data.Email.Length < 3)
+                    Errors.Add(new { Property = "Email", Message = "Email must have at least 3 characters" });
+            }
+        }
+
+        private void StudentDataValidation(UpdateStudentData data, string id)
+        {
+            if (data == null)
+                Errors.Add(new { Message = "Data is null" });
+            else //PUT validation
+            {
+                if (!StudentExists(id))
+                    Errors.Add(new { Property = "Student", Message = "Student not found" });
 
                 if (string.IsNullOrEmpty(data.Name))
                     Errors.Add(new { Property = "Name", Message = "Name field is required" });
