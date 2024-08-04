@@ -13,7 +13,7 @@
     components: { StudentForm },
     data() {
       return {
-        student: null
+        student: { studentID: '', name: '', cpf: '', email: '' }
       }
     },
     methods: {
@@ -25,12 +25,14 @@
           });
       },
       editStudent(updatedStudent) {
-        axios.put(`https://localhost:7280/api/students/${this.$route.params.id}`, updatedStudent)
-          .then(() => {
-            this.$swal({ icon: 'success', title: 'Sucesso!', text: 'Aluno atualizado com sucesso', confirmButtonColor: "#2196F3" })
-                .then((res) => this.$router.push({ name: 'StudentList' }))
-            
-          });
+        if (updatedStudent?.name && updatedStudent?.email) {
+            axios.put(`https://localhost:7280/api/students/${this.$route.params.id}`, updatedStudent)
+            .then(() => {
+                this.$swal({ icon: 'success', title: 'Sucesso!', text: 'Aluno atualizado com sucesso', confirmButtonColor: "#2196F3" })
+                    .then((res) => this.$router.push({ name: 'StudentList' }))
+                
+            });
+        }
       }
     },
     created() {

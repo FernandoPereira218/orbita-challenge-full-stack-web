@@ -9,9 +9,11 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 import StudentListView from '@/components/StudentListView.vue';
 import EditStudent from '@/components/EditStudent.vue';
 import AddStudent from '@/components/AddStudent.vue';
+import StarterPage from '@/components/StarterPage.vue';
 //import { routes } from 'vue-router/auto-routes'
 
 const routes = [
+    { path: '/', name: 'StarterPage', component: StarterPage },
     { path: '/list', name: 'StudentList', component: StudentListView },
     { path: '/new', name: 'AddStudent', component: AddStudent },
     { path: '/edit/:id', name: 'EditStudent', component: EditStudent }

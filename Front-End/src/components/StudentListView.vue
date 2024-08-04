@@ -5,7 +5,7 @@
             <v-spacer></v-spacer>
         </v-col>
         <v-col style="margin-top: 10px;">
-            <v-btn class="ma-2 pa-2" color="success" prepend-icon="mdi-plus" @click="this.$router.push({ name: 'AddStudent' })">Novo</v-btn>
+            <v-btn class="ma-2 pa-2" color="success" prepend-icon="mdi-plus" @click="this.$router.push({ name: 'AddStudent' })">Cadastrar Aluno</v-btn>
         </v-col>
     </v-row>
     <v-data-table-server
@@ -19,10 +19,21 @@
       @update:options="loadItems"
     >
         <template v-slot:item.action="{ item }">
-        <v-btn @click="this.$router.push({ name: 'EditStudent', params: { id: item.studentID } })" color="blue" class="me-2" icon="mdi-pencil"></v-btn>
-        <v-btn @click="deleteStudent(item.studentID)" color="red" class="me-2" icon="mdi-delete">
-            
-        </v-btn>
+        <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" color="blue" class="me-2"  icon="mdi-pencil" @click="this.$router.push({ name: 'EditStudent', params: { id: item.studentID } })">
+                </v-btn>
+            </template>
+            <span>Editar</span>
+        </v-tooltip>
+        <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" color="red" class="me-2" icon="mdi-delete" @click="deleteStudent(item.studentID)">
+                </v-btn>
+            </template>
+            <span>Excluir</span>
+        </v-tooltip>
+
         </template>
     </v-data-table-server>
   </template>
@@ -34,7 +45,7 @@
             return await axios
             .get(`https://localhost:7280/api/students?page=${page}&pageLength=${itemsPerPage}&search=${search}`)
             .then(response => {
-                return { items: response.data, total: response.data.length }
+                return { items: response.data.list, total: response.data.length }
             })
             .catch(error => {
                 console.log(error)
@@ -53,7 +64,7 @@
         itemsPerPage: 10,
         headers: [
           {
-            title: 'RA',
+            title: 'Registro Acadêmico',
             align: 'start',
             sortable: false,
             key: 'studentID',
@@ -76,9 +87,6 @@
                 this.totalItems = total
                 this.loading = false
             })
-        },
-        test (item) {
-            console.log('item', item)
         },
         deleteStudent (item) {
             this.$swal(

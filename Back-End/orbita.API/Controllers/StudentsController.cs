@@ -37,7 +37,6 @@ namespace orbita.API.Controllers
             if (IsValid)
             {
                 var studentList = await _context.Students.ToListAsync();
-
                 if (!string.IsNullOrEmpty(search)) //Search filter
                 {
                     search = search.ToLower();
@@ -49,11 +48,13 @@ namespace orbita.API.Controllers
                    .ToList();
                 }
 
+                int count = studentList.Count;
+
                 studentList = studentList.Skip((page.Value - 1) * pageLength.Value)
                     .Take(pageLength.Value)
                     .ToList();
 
-                return Ok(studentList);
+                return Ok(new { list = studentList, length = count });
             }
             else
                 return BadRequest(new { Errors });
