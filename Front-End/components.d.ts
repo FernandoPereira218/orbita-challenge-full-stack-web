@@ -7,10 +7,15 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddStudent: typeof import('./src/components/AddStudent.vue')['default']
+    EditStudent: typeof import('./src/components/EditStudent.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    List: typeof import('./src/components/list.vue')['default']
     ListView: typeof import('./src/components/ListView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StudentForm: typeof import('./src/components/StudentForm.vue')['default']
+    StudentListView: typeof import('./src/components/StudentListView.vue')['default']
     Test: typeof import('./src/components/test.vue')['default']
   }
 }

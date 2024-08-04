@@ -7,7 +7,7 @@
 	
 	## Front-end
 		axios
-		Sweet Alert
+		vue-sweetalert2
 	
 # Detalhes
 	O back-end foi desenvolvido utilizando .NET Core 8.

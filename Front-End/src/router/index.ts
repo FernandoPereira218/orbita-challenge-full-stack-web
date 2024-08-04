@@ -6,7 +6,16 @@
 
 // Composables
 import { createRouter, createWebHistory } from 'vue-router/auto'
-import { routes } from 'vue-router/auto-routes'
+import StudentListView from '@/components/StudentListView.vue';
+import EditStudent from '@/components/EditStudent.vue';
+import AddStudent from '@/components/AddStudent.vue';
+//import { routes } from 'vue-router/auto-routes'
+
+const routes = [
+    { path: '/list', name: 'StudentList', component: StudentListView },
+    { path: '/new', name: 'AddStudent', component: AddStudent },
+    { path: '/edit/:id', name: 'EditStudent', component: EditStudent }
+  ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

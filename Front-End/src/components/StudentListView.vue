@@ -1,9 +1,11 @@
 <template>
-    
     <v-row no-gutters>
         <v-col>
             <v-text-field v-model="search" class="ma-2 pa-2" density="compact" placeholder="Pesquisar..." hide-details />
             <v-spacer></v-spacer>
+        </v-col>
+        <v-col style="margin-top: 10px;">
+            <v-btn class="ma-2 pa-2" color="success" prepend-icon="mdi-plus" @click="this.$router.push({ name: 'AddStudent' })">Novo</v-btn>
         </v-col>
     </v-row>
     <v-data-table-server
@@ -17,9 +19,7 @@
       @update:options="loadItems"
     >
         <template v-slot:item.action="{ item }">
-        <v-btn @click="test(item.studentID)" color="blue" class="me-2" icon="mdi-pencil">
-            
-        </v-btn>
+        <v-btn @click="this.$router.push({ name: 'EditStudent', params: { id: item.studentID } })" color="blue" class="me-2" icon="mdi-pencil"></v-btn>
         <v-btn @click="deleteStudent(item.studentID)" color="red" class="me-2" icon="mdi-delete">
             
         </v-btn>
@@ -39,8 +39,12 @@
             .catch(error => {
                 console.log(error)
                 this.errored = true
+                return { items: [], total: 0 }
             })
-            .finally(() => this.loading = false)
+            .finally(() => {
+                this.loading = false
+                return { items: [], total: 0 }
+            })
         }
     }
   
@@ -77,7 +81,29 @@
             console.log('item', item)
         },
         deleteStudent (item) {
-            console.log('delete', item)
+            this.$swal(
+                {
+                    title: 'Atenção',
+                    icon: 'warning',
+                    text: `Tem certeza que deseja remover este aluno?`,
+                    showDenyButton: true,
+                    denyButtonText: 'Não',
+                    confirmButtonText: 'Sim',
+                    confirmButtonColor: '#F44336',
+                    denyButtonColor: '#2196F3'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        axios.delete(`https://localhost:7280/api/students/${item}`)
+                        .then(response => {
+
+                            this.$swal({ icon: 'success', title: 'Sucesso!', text: 'Aluno removido com sucesso', confirmButtonColor: "#2196F3" })
+                            .then((res) => location.reload())
+                        })
+                        .catch(err => {
+                            this.$swal({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro', confirmButtonColor: "#2196F3" })
+                        })
+                    }
+                });
         }
       },
     }

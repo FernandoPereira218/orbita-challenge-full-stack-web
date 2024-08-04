@@ -42,10 +42,10 @@ namespace orbita.API.Controllers
                 {
                     search = search.ToLower();
                     studentList = studentList.Where(x =>
-                    x.CPF.ToLower().Contains(search) ||
-                    x.Name.ToLower().Contains(search) ||
-                    x.StudentID.ToLower().Contains(search) ||
-                    x.Email.ToLower().Contains(search))
+                        x.CPF.ToLower().Contains(search) ||
+                        x.Name.ToLower().Contains(search) ||
+                        x.StudentID.ToLower().Contains(search) ||
+                        x.Email.ToLower().Contains(search))
                    .ToList();
                 }
 
@@ -83,7 +83,7 @@ namespace orbita.API.Controllers
             {
                 var student = _context.Students.Where(x => x.StudentID == id).FirstOrDefault();
                 student.Name = request.Name;
-                student.Email = request.Name;
+                student.Email = request.Email;
 
                 _context.Update(student);
 
