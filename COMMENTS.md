@@ -38,6 +38,8 @@ Existem diversas coisas que eu gostaria de priorizar com mais tempo de desenvolv
 
 Por exemplo, gostaria de ter adicionado um método de autenticação, a fim de demonstrar uma maneira de diferenciar usuários com permissão para remover alunos da base de dados e usuários que podem apenas criar novos.
 
+Outra coisa que gostaria de melhorar é a estrutura do back-end. Gosto de utilizar a separação das camadas da API com a camada de *Domain* para as *Models* e a camada de *Infrastructure* para mapeamento das *Models* na base de dados.
+
 Também gostaria de ter adicionado os testes unitários.
 
 Por fim gostaria de ter conseguido dedicar mais tempo à estilização do projeto, com uma paleta de cores e estilos mais bem definido além dos já disponíveis do vuetify.
