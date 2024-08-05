@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1>Cadastrar Aluno</h1>
         <StudentForm :student="student" @submit="addNewStudent" />
     </div>
 </template>

@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1>Editar Aluno</h1>
         <StudentForm :student="student" @submit="editStudent" />
     </div>
 </template>

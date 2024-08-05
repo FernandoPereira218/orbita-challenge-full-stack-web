@@ -1,5 +1,5 @@
 <template>
-    <v-card class="mx-auto" width="80%" style="margin-top: 25px;">
+    <v-card class="mx-auto" width="80%" style="margin-top: 25px;" :title="!!student.studentID === false ? 'Adicionar Aluno' : 'Editar Aluno'">
         <v-sheet class="mx-auto" width="50%">
             <v-form fast-fail @submit.prevent="handleSubmit" class="form-data" v-model="isFormValid"> 
                 <v-text-field
